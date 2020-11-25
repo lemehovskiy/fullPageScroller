@@ -1,10 +1,9 @@
 require("./sass/style.scss");
 
-require ("jquery");
+require("jquery");
 
-require('../dist/full_page_scroller.js');
+require("../dist/full-page-scroller.js");
 
-
-$(document).ready(function () {
-
+jQuery(function () {
+  $(".full-page").fullPageScroller();
 });
