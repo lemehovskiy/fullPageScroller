@@ -5,7 +5,7 @@
  Repo: https://github.com/lemehovskiy/full-page-scroller
  */
 
-import "../test/jquery.mousewheel.js";
+// import "../test/jquery.mousewheel.js";
 
 ("use strict");
 
@@ -32,6 +32,7 @@ import "../test/jquery.mousewheel.js";
 
       self.sectionsByHash = {};
       self.totalSlides = self.$sections.length;
+      self.animationInProgress = false;
 
       self.state = {
         index: 0,
@@ -60,81 +61,90 @@ import "../test/jquery.mousewheel.js";
       // console.log(index);
       let self = this;
 
+      if (self.animationInProgress) return;
+
+      self.animationInProgress = true;
       self.state.index = index;
 
       $([document.documentElement]).animate(
         {
           scrollTop: $(self.sectionsByHash[index].$element).offset().top,
         },
-        1000,
+        400,
         function () {
           console.log("animationEnd");
-          self.state.animationInProgress = false;
+          self.animationInProgress = false;
         }
       );
     }
 
     goPrev() {
-      if (this.state.animationInProgress) return;
-
       const prevIndex = this.state.index - 1;
       if (prevIndex >= 0) {
         console.log("goPrev");
-        this.state.animationInProgress = true;
         this.goToSlide(prevIndex);
       }
     }
     goNext() {
-      if (this.state.animationInProgress) return;
-
       const nextIndex = this.state.index + 1;
       if (nextIndex > this.totalSlides - 1) return;
-
       console.log("goNext");
       this.goToSlide(nextIndex);
     }
 
     initScroll() {
+      //   self.$element.on('mousewheel', function(event) {
+      //     console.log(event.originalEvent);
+      // });
       let self = this;
       let absDeltaY = 0;
       let scrollTimer = false;
-      let accelerationTimer = null; 
       let prevAbsDeltaYUp = 0;
       let prevAbsDeltaYDown = 0;
 
-      self.$element.on("scroll touchmove mousewheel", function (e) {
-        // console.log('handleScroll');
-        // console.log(self.state.animationInProgress);
-        if (self.state.animationInProgress) {
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
-        }
+      this.$element.on("scroll touchmove mousewheel", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+
+      this.$element.on("scroll touchmove mousewheel", (e) => {
+
+        // console.log(e.originalEvent.deltaY);
+        clearTimeout(scrollTimer);
+
+        // if (self.animationInProgress) {
+        // e.preventDefault();
+        // e.stopPropagation();
+        // return false;
+        // }
+
         absDeltaY = Math.abs(e.originalEvent.deltaY);
 
         if (e.originalEvent.deltaY < 0) {
+          console.log(prevAbsDeltaYUp);
+          console.log(absDeltaY);
+
           if (absDeltaY > prevAbsDeltaYUp) {
             self.goPrev();
-            prevAbsDeltaYUp = absDeltaY;
           }
+          prevAbsDeltaYUp = absDeltaY;
         } else if (e.originalEvent.deltaY > 0) {
           if (absDeltaY > prevAbsDeltaYDown) {
             self.goNext();
-            prevAbsDeltaYDown = absDeltaY;
           }
+          prevAbsDeltaYDown = absDeltaY;
         }
 
-        clearTimeout(scrollTimer);
         scrollTimer = setTimeout(function () {
           prevAbsDeltaYUp = 0;
           prevAbsDeltaYDown = 0;
         }, 50);
-
-        // e.preventDefault();
-        // e.stopPropagation();
-        // return false;
       });
     }
+
+    subscribeToScroll = () => {};
+
+    handleScroll(e) {}
 
     initSwipe() {
       let self = this;
