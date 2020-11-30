@@ -183,7 +183,11 @@ body {
   cursor: pointer;
 }
 
-.full-page.hideInvisibleSections section:not(.active) {
+.full-page section.show .section-collapse-content {
+  display: block;
+}
+
+.full-page.hideInvisibleSections section:not(.show) {
   display: none;
 }
 
@@ -191,10 +195,6 @@ body {
   -webkit-transform: translateY(-100px);
   -ms-transform: translateY(-100px);
   transform: translateY(-100px);
-}
-
-.full-page.section-opened section.active .section-collapse-content {
-  display: block;
 }
 
 .full-page.section-opened .closeCollapseButton {

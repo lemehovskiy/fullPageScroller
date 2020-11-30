@@ -36,9 +36,16 @@ body {
 
 
 .full-page {
+  section { 
+    &.show {
+      .section-collapse-content {
+        display: block;
+      }
+    }
+  }
   &.hideInvisibleSections {
     section {
-      &:not(.active) {
+      &:not(.show) {
         display: none;
       }
     }
@@ -52,12 +59,6 @@ body {
       &.offsetActive {
         .section-main-content {
           transform: translateY(-100px);
-        }
-      }
-    
-      &.active {
-        .section-collapse-content {
-          display: block;
         }
       }
     }

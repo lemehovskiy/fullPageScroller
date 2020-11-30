@@ -88,12 +88,15 @@
       $(self.sectionsByHash[self.state.index].$element).removeClass(
         "offsetActive"
       );
+      // $(self.sectionsByHash[self.state.index].$element).("active");
 
       if (self.state.closeButtonMode === "next") {
         self.$element.removeClass("hideInvisibleSections");
         self.$element.removeClass("section-opened");
         console.log("goNext");
-        self.goNext();
+        self.goNext().then(() => {
+          self.$sections.removeClass("show");
+        });
       } else {
         $([document.documentElement]).animate(
           {
@@ -105,6 +108,7 @@
           () => {
             self.$element.removeClass("section-opened");
             self.$element.removeClass("hideInvisibleSections");
+            self.$sections.removeClass("show");
 
             $([document.documentElement]).scrollTop(
               $(self.sectionsByHash[self.state.index].$element).offset().top
@@ -129,7 +133,7 @@
 
       for (let i = 0; i < self.totalSlides; i++) {
         if (i === index) {
-          $(self.sectionsByHash[index].$element).addClass("active");
+          $(self.sectionsByHash[index].$element).addClass("show");
           $(self.sectionsByHash[index].$element).addClass("offsetActive");
           $([document.documentElement]).animate(
             {
@@ -140,31 +144,37 @@
             400
           );
         } else {
-          $(self.sectionsByHash[i].$element).removeClass("active");
+          $(self.sectionsByHash[i].$element).removeClass("show");
         }
       }
     }
 
     goToSlide(index) {
-      console.log("goToSlide");
-      // console.log(index);
-      let self = this;
+      return new Promise((resolve, reject) => {
+        console.log("goToSlide");
+        // console.log(index);
+        let self = this;
 
-      if (self.animationInProgress) return;
+        if (self.animationInProgress) return;
 
-      self.animationInProgress = true;
-      self.state.index = index;
+        self.animationInProgress = true;
+        self.state.index = index;
 
-      $([document.documentElement]).animate(
-        {
-          scrollTop: $(self.sectionsByHash[index].$element).offset().top,
-        },
-        400,
-        function () {
-          console.log("animationEnd");
-          self.animationInProgress = false;
-        }
-      );
+        $(self.$sections).removeClass("current");
+        $(self.sectionsByHash[index].$element).addClass("current");
+
+        $([document.documentElement]).animate(
+          {
+            scrollTop: $(self.sectionsByHash[index].$element).offset().top,
+          },
+          400,
+          function () {
+            console.log("animationEnd");
+            self.animationInProgress = false;
+            resolve();
+          }
+        );
+      });
     }
 
     goPrev() {
@@ -176,7 +186,7 @@
     goNext() {
       const nextIndex = this.state.index + 1;
       if (nextIndex > this.totalSlides - 1) return;
-      this.goToSlide(nextIndex);
+      return this.goToSlide(nextIndex);
     }
 
     blockScroll(e) {
