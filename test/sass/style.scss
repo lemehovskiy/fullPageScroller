@@ -1,14 +1,12 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto:400,600');
+@import url("https://fonts.googleapis.com/css?family=Roboto:400,600");
 
 @import "_reset.scss";
 @import "mixins.scss";
 
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   font-size: 18px;
-
 }
-
 
 .back-img {
   background-size: cover;
@@ -18,11 +16,6 @@ body {
 
 .container {
   margin: auto;
-
-}
-
-section {
-  padding: 0 20px;
 }
 
 .rect-outer {
@@ -33,10 +26,60 @@ section {
     left: 0;
     right: 0;
     bottom: 0;
-
   }
 }
 
+.showMoreButton {
+  padding: 10px;
+  cursor: pointer;
+}
+
+
+.full-page {
+  &.section-opened {
+    section {
+      &:not(.active) {
+        display: none;
+      }
+
+      &.active {
+        .section-main-content {
+          transform: translateY(-100px);
+        }
+        .section-collapse-content {
+          display: block;
+        }
+      }
+    }
+    .closeCollapseButton {
+      display: block;
+    }
+  }
+}
+
+.closeCollapseButton {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  z-index: 2;
+  display: none;
+}
+
+.section-main-content {
+  height: 100vh;
+  padding: 0 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform .2s;
+}
+.section-collapse-content {
+  display: none;
+}
+
+.block {
+  padding: 100px 50px;
+}
 
 @import "partials/section-intro";
 @import "partials/section-features-list";

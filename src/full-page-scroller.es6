@@ -37,6 +37,8 @@
       self.state = {
         index: 0,
         animationInProgress: false,
+        nestedSectionOpened: false,
+        closeButtonMode: 'close',
       };
 
       self.init();
@@ -48,12 +50,102 @@
       self.$sections.each((index, el) => {
         self.sectionsByHash[index] = {
           $element: el,
+          $collapseTrigger: $(el).find(".showMoreButton"),
         };
       });
 
       this.initSwipe();
       this.initScroll();
-      this.goToSlide(3);
+      this.subscribeBlockScroll();
+      this.handleSlickShowMoreButton();
+      // this.goToSlide(3);
+      this.initCloseCollapseButton();
+      // this.subscribeSectionScroll();
+    }
+
+    initCloseCollapseButton() {
+      let self = this;
+      $(".closeCollapseButton").on("click", () => {
+        console.log("closeSection");
+        self.closeSection();
+      });
+    }
+
+    handleSlickShowMoreButton() {
+      let self = this;
+
+      for (let i = 0; i < self.totalSlides; i++) {
+        self.sectionsByHash[i].$collapseTrigger.on("click", () => {
+          this.openSection(i);
+          // console.log("asdfasd");
+        });
+      }
+
+      // $(".showMoreButton").on("click", () => {
+      //   console.log(11);
+      // });
+    }
+    closeSection() {
+      let self = this;
+
+      self.subscribeBlockScroll();
+      self.state.nestedSectionOpened = false;
+      // self.$element.removeClass("section-opened");
+
+      self.unsubscribeSectionScroll();
+
+      if (self.state.closeButtonMode === 'next') {
+
+        self.$element.removeClass("section-opened");
+        console.log('goNext');
+        self.goNext();
+      }
+      else {
+        $([document.documentElement]).animate(
+          {
+            scrollTop: $(self.sectionsByHash[self.state.index].$element).offset()
+              .top,
+          },
+          400,
+          () => {
+            self.$element.removeClass("section-opened");
+  
+            $([document.documentElement]).scrollTop(
+              $(self.sectionsByHash[self.state.index].$element).offset().top
+            );
+          }
+        );
+      }
+    }
+
+    openSection(index) {
+      let self = this;
+
+      self.$element.addClass("section-opened");
+      self.unsubscribeBlockScroll();
+      self.subscribeSectionScroll();
+      self.state.nestedSectionOpened = true;
+
+      $([document.documentElement]).scrollTop(
+        $(self.sectionsByHash[index].$element).offset().top
+      );
+
+      for (let i = 0; i < self.totalSlides; i++) {
+        if (i === index) {
+          $(self.sectionsByHash[index].$element).addClass("active");
+
+          $([document.documentElement]).animate(
+            {
+              scrollTop: $(self.sectionsByHash[index].$element)
+                .find(".section-collapse-content")
+                .offset().top,
+            },
+            400
+          );
+        } else {
+          $(self.sectionsByHash[i].$element).removeClass("active");
+        }
+      }
     }
 
     goToSlide(index) {
@@ -81,49 +173,71 @@
     goPrev() {
       const prevIndex = this.state.index - 1;
       if (prevIndex >= 0) {
-        console.log("goPrev");
         this.goToSlide(prevIndex);
       }
     }
     goNext() {
       const nextIndex = this.state.index + 1;
       if (nextIndex > this.totalSlides - 1) return;
-      console.log("goNext");
       this.goToSlide(nextIndex);
     }
 
+    blockScroll(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    subscribeBlockScroll() {
+      this.$element.on("scroll touchmove mousewheel", this.blockScroll);
+    }
+
+    unsubscribeBlockScroll() {
+      this.$element.off("scroll touchmove mousewheel", this.blockScroll);
+    }
+
+    subscribeSectionScroll() {
+      let self = this;
+      $(window).on(
+        "scroll touchmove mousewheel",
+        this.handleSectionScroll.bind(this)
+      );
+    }
+
+    unsubscribeSectionScroll() {
+      $(window).off("scroll touchmove mousewheel");
+    }
+
+    handleSectionScroll(e) {
+      let self = this;
+
+      if (
+        $(window).scrollTop() >=
+        self.$element.outerHeight() - $(window).height()
+      ) {
+        self.state.closeButtonMode = 'next';
+        $(".closeCollapseButton").text("Next");
+      } else {
+        self.state.closeButtonMode = 'close';
+        $(".closeCollapseButton").text("Close");
+      }
+      // console.log($(window).scrollTop());
+      // console.log(self.$element.outerHeight() + window).height())
+      // console.log($(window).height())
+    }
+
     initScroll() {
-      //   self.$element.on('mousewheel', function(event) {
-      //     console.log(event.originalEvent);
-      // });
       let self = this;
       let absDeltaY = 0;
-      let scrollTimer = false;
+      // let scrollTimer = false;
       let prevAbsDeltaYUp = 0;
       let prevAbsDeltaYDown = 0;
 
       this.$element.on("scroll touchmove mousewheel", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      });
-
-      this.$element.on("scroll touchmove mousewheel", (e) => {
-
-        // console.log(e.originalEvent.deltaY);
-        clearTimeout(scrollTimer);
-
-        // if (self.animationInProgress) {
-        // e.preventDefault();
-        // e.stopPropagation();
-        // return false;
-        // }
-
+        if (self.state.nestedSectionOpened) return;
+        // clearTimeout(scrollTimer);
         absDeltaY = Math.abs(e.originalEvent.deltaY);
 
         if (e.originalEvent.deltaY < 0) {
-          console.log(prevAbsDeltaYUp);
-          console.log(absDeltaY);
-
           if (absDeltaY > prevAbsDeltaYUp) {
             self.goPrev();
           }
@@ -135,14 +249,20 @@
           prevAbsDeltaYDown = absDeltaY;
         }
 
-        scrollTimer = setTimeout(function () {
-          prevAbsDeltaYUp = 0;
-          prevAbsDeltaYDown = 0;
-        }, 50);
+        // scrollTimer = setTimeout(function () {
+        //   prevAbsDeltaYUp = 0;
+        //   prevAbsDeltaYDown = 0;
+        // }, 50);
       });
     }
 
-    subscribeToScroll = () => {};
+    // subscribeToScroll = () => {
+
+    // };
+
+    // unsubscribeToScroll = () => {
+
+    // };
 
     handleScroll(e) {}
 
