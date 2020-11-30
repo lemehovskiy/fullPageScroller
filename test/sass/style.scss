@@ -36,16 +36,26 @@ body {
 
 
 .full-page {
-  &.section-opened {
+  &.hideInvisibleSections {
     section {
       &:not(.active) {
         display: none;
       }
+    }
+  }
 
-      &.active {
+  &.showSectionContent {
+
+  }
+  &.section-opened {
+    section {
+      &.offsetActive {
         .section-main-content {
           transform: translateY(-100px);
         }
+      }
+    
+      &.active {
         .section-collapse-content {
           display: block;
         }
@@ -71,7 +81,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: transform .2s;
+  transition: transform .5s;
 }
 .section-collapse-content {
   display: none;

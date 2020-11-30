@@ -38,7 +38,7 @@
         index: 0,
         animationInProgress: false,
         nestedSectionOpened: false,
-        closeButtonMode: 'close',
+        closeButtonMode: "close",
       };
 
       self.init();
@@ -58,9 +58,7 @@
       this.initScroll();
       this.subscribeBlockScroll();
       this.handleSlickShowMoreButton();
-      // this.goToSlide(3);
       this.initCloseCollapseButton();
-      // this.subscribeSectionScroll();
     }
 
     initCloseCollapseButton() {
@@ -77,39 +75,37 @@
       for (let i = 0; i < self.totalSlides; i++) {
         self.sectionsByHash[i].$collapseTrigger.on("click", () => {
           this.openSection(i);
-          // console.log("asdfasd");
         });
       }
-
-      // $(".showMoreButton").on("click", () => {
-      //   console.log(11);
-      // });
     }
     closeSection() {
       let self = this;
 
       self.subscribeBlockScroll();
       self.state.nestedSectionOpened = false;
-      // self.$element.removeClass("section-opened");
 
       self.unsubscribeSectionScroll();
+      $(self.sectionsByHash[self.state.index].$element).removeClass(
+        "offsetActive"
+      );
 
-      if (self.state.closeButtonMode === 'next') {
-
+      if (self.state.closeButtonMode === "next") {
+        self.$element.removeClass("hideInvisibleSections");
         self.$element.removeClass("section-opened");
-        console.log('goNext');
+        console.log("goNext");
         self.goNext();
-      }
-      else {
+      } else {
         $([document.documentElement]).animate(
           {
-            scrollTop: $(self.sectionsByHash[self.state.index].$element).offset()
-              .top,
+            scrollTop: $(
+              self.sectionsByHash[self.state.index].$element
+            ).offset().top,
           },
           400,
           () => {
             self.$element.removeClass("section-opened");
-  
+            self.$element.removeClass("hideInvisibleSections");
+
             $([document.documentElement]).scrollTop(
               $(self.sectionsByHash[self.state.index].$element).offset().top
             );
@@ -122,6 +118,7 @@
       let self = this;
 
       self.$element.addClass("section-opened");
+      self.$element.addClass("hideInvisibleSections");
       self.unsubscribeBlockScroll();
       self.subscribeSectionScroll();
       self.state.nestedSectionOpened = true;
@@ -133,7 +130,7 @@
       for (let i = 0; i < self.totalSlides; i++) {
         if (i === index) {
           $(self.sectionsByHash[index].$element).addClass("active");
-
+          $(self.sectionsByHash[index].$element).addClass("offsetActive");
           $([document.documentElement]).animate(
             {
               scrollTop: $(self.sectionsByHash[index].$element)
@@ -214,15 +211,12 @@
         $(window).scrollTop() >=
         self.$element.outerHeight() - $(window).height()
       ) {
-        self.state.closeButtonMode = 'next';
+        self.state.closeButtonMode = "next";
         $(".closeCollapseButton").text("Next");
       } else {
-        self.state.closeButtonMode = 'close';
+        self.state.closeButtonMode = "close";
         $(".closeCollapseButton").text("Close");
       }
-      // console.log($(window).scrollTop());
-      // console.log(self.$element.outerHeight() + window).height())
-      // console.log($(window).height())
     }
 
     initScroll() {
@@ -248,23 +242,8 @@
           }
           prevAbsDeltaYDown = absDeltaY;
         }
-
-        // scrollTimer = setTimeout(function () {
-        //   prevAbsDeltaYUp = 0;
-        //   prevAbsDeltaYDown = 0;
-        // }, 50);
       });
     }
-
-    // subscribeToScroll = () => {
-
-    // };
-
-    // unsubscribeToScroll = () => {
-
-    // };
-
-    handleScroll(e) {}
 
     initSwipe() {
       let self = this;

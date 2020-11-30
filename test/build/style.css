@@ -183,11 +183,11 @@ body {
   cursor: pointer;
 }
 
-.full-page.section-opened section:not(.active) {
+.full-page.hideInvisibleSections section:not(.active) {
   display: none;
 }
 
-.full-page.section-opened section.active .section-main-content {
+.full-page.section-opened section.offsetActive .section-main-content {
   -webkit-transform: translateY(-100px);
   -ms-transform: translateY(-100px);
   transform: translateY(-100px);
@@ -221,11 +221,11 @@ body {
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  -webkit-transition: -webkit-transform .2s;
-  transition: -webkit-transform .2s;
-  -o-transition: transform .2s;
-  transition: transform .2s;
-  transition: transform .2s, -webkit-transform .2s;
+  -webkit-transition: -webkit-transform .5s;
+  transition: -webkit-transform .5s;
+  -o-transition: transform .5s;
+  transition: transform .5s;
+  transition: transform .5s, -webkit-transform .5s;
 }
 
 .section-collapse-content {
