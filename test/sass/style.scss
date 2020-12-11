@@ -55,6 +55,9 @@ body {
 
   }
   &.section-opened {
+    .showMoreButton {
+      display: none;
+    }
     section {
       &.offsetActive {
         .section-main-content {

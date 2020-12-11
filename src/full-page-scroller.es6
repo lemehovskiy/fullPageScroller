@@ -54,7 +54,7 @@
         };
       });
 
-      this.initSwipe();
+      // this.initSwipe();
       this.initScroll();
       this.subscribeBlockScroll();
       this.handleSlickShowMoreButton();
@@ -219,7 +219,8 @@
 
       if (
         $(window).scrollTop() >=
-        self.$element.outerHeight() - $(window).height()
+          self.$element.outerHeight() - $(window).height() &&
+        self.state.index < self.totalSlides - 1
       ) {
         self.state.closeButtonMode = "next";
         $(".closeCollapseButton").text("Next");

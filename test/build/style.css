@@ -191,6 +191,10 @@ body {
   display: none;
 }
 
+.full-page.section-opened .showMoreButton {
+  display: none;
+}
+
 .full-page.section-opened section.offsetActive .section-main-content {
   -webkit-transform: translateY(-100px);
   -ms-transform: translateY(-100px);
