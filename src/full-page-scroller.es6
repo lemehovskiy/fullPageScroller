@@ -126,7 +126,7 @@
       self.$element.addClass("hideInvisibleSections");
       self.unsubscribeBlockScroll();
       self.subscribeSectionScroll();
-      
+
       self.state.nestedSectionOpened = true;
 
       $([document.documentElement]).scrollTop(
@@ -152,31 +152,28 @@
     }
 
     goToSlide(index) {
-      return new Promise((resolve, reject) => {
-        console.log("goToSlide");
-        // console.log(index);
-        let self = this;
+      console.log("goToSlide");
+      // console.log(index);
+      let self = this;
 
-        if (self.animationInProgress) return;
+      if (self.animationInProgress) return;
 
-        self.animationInProgress = true;
-        self.state.index = index;
+      self.animationInProgress = true;
+      self.state.index = index;
 
-        $(self.$sections).removeClass("current");
-        $(self.sectionsByHash[index].$element).addClass("current");
+      $(self.$sections).removeClass("current");
+      $(self.sectionsByHash[index].$element).addClass("current");
 
-        $([document.documentElement]).animate(
-          {
-            scrollTop: $(self.sectionsByHash[index].$element).offset().top,
-          },
-          400,
-          function () {
-            console.log("animationEnd");
-            self.animationInProgress = false;
-            resolve();
-          }
-        );
-      });
+      $([document.documentElement]).animate(
+        {
+          scrollTop: $(self.sectionsByHash[index].$element).offset().top,
+        },
+        400,
+        function () {
+          console.log("animationEnd");
+          self.animationInProgress = false;
+        }
+      );
     }
 
     goPrev() {
@@ -197,11 +194,11 @@
     }
 
     subscribeBlockScroll() {
-      this.$element.on("scroll touchmove mousewheel", this.blockScroll);
+      this.$element.on("wheel scroll touchmove mousewheel", this.blockScroll);
     }
 
     unsubscribeBlockScroll() {
-      this.$element.off("scroll touchmove mousewheel", this.blockScroll);
+      this.$element.off("wheel scroll touchmove mousewheel", this.blockScroll);
     }
 
     subscribeSectionScroll() {
@@ -218,8 +215,10 @@
 
       // console.log(self.$element.outerHeight());
       // console.log($(window).height());
-      $('#debug .height').text(self.$element.outerHeight() - $(window).height());
-      $('#debug .scrollTop').text($(window).scrollTop());
+      $("#debug .height").text(
+        self.$element.outerHeight() - $(window).height()
+      );
+      $("#debug .scrollTop").text($(window).scrollTop());
 
       if (
         $(window).scrollTop() + 80 >=
@@ -241,9 +240,9 @@
       let prevAbsDeltayDown = 0;
       let deltaClearTimeout = null;
 
-      this.$element.on("scroll mousewheel", (e) => {
+      this.$element.on("scroll wheel mousewheel", (e) => {
         clearTimeout(deltaClearTimeout);
-  
+
         if (self.state.nestedSectionOpened) return;
 
         absDeltaY = Math.abs(e.originalEvent.deltaY);
@@ -254,7 +253,6 @@
           }
           prevAbsDeltaYUp = absDeltaY;
           prevAbsDeltayDown = 0;
-          
         } else if (e.originalEvent.deltaY > 0) {
           if (absDeltaY > prevAbsDeltayDown) {
             self.goNext();
@@ -268,8 +266,6 @@
           prevAbsDeltayDown = 0;
         }, 50);
       });
-
-      
     }
 
     getTouches(evt) {
@@ -277,7 +273,7 @@
         evt.touches || // browser API
         evt.originalEvent.touches
       ); // jQuery
-    } 
+    }
 
     handleTouchStart(evt) {
       let self = this;
@@ -291,11 +287,10 @@
     handleTouchMove(evt) {
       let self = this;
       if (self.state.nestedSectionOpened) return;
-    
-      console.log('handleTouchMove')
+
+      console.log("handleTouchMove");
       console.log(self.xDownTouch);
       console.log(self.yDownTouch);
-
 
       if (!self.xDownTouch || !self.yDownTouch) {
         return;
