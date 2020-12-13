@@ -222,8 +222,8 @@
       $('#debug .scrollTop').text($(window).scrollTop());
 
       if (
-        $(window).scrollTop() >=
-          self.$element.outerHeight() - $(document).height() &&
+        $(window).scrollTop() + 80 >=
+          self.$element.outerHeight() - $(window).height() &&
         self.state.index < self.totalSlides - 1
       ) {
         self.state.closeButtonMode = "next";
