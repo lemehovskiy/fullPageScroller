@@ -216,6 +216,11 @@
     handleSectionScroll(e) {
       let self = this;
 
+      // console.log(self.$element.outerHeight());
+      // console.log($(window).height());
+      $('#debug .height').text(self.$element.outerHeight() - $(window).height());
+      $('#debug .scrollTop').text($(window).scrollTop());
+
       if (
         $(window).scrollTop() >=
           self.$element.outerHeight() - $(document).height() &&
