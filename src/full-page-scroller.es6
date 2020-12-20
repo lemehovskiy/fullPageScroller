@@ -39,6 +39,8 @@
         animationInProgress: false,
         nestedSectionOpened: false,
         closeButtonMode: "close",
+        handleSectionScroll: false,
+        handleAutoHeightSectionScroll: false,
       };
 
       self.init();
@@ -226,15 +228,18 @@
 
     subscribeSectionScroll() {
       let self = this;
+      this.state.handleSectionScroll = true;
       $(window).on("scroll mousewheel", this.handleSectionScroll.bind(this));
     }
 
     unsubscribeSectionScroll() {
+      this.state.handleSectionScroll = false;
       // $(window).off("scroll mousewheel", this.handleSectionScroll.bind(this));
     }
 
     subscribeAutoHeightSectionScroll() {
       console.log("subscribeAutoHeightSectionScroll");
+      this.state.handleAutoHeightSectionScroll = true;
       $(window).on(
         "scroll mousewheel",
         this.handleAutoHeightSectionScroll.bind(this)
@@ -243,12 +248,16 @@
 
     unsubscribeAutoHeightSectionScroll() {
       console.log("subscribeAutoHeightSectionScroll");
+      this.state.handleAutoHeightSectionScroll = false;
       // $(window).off("scroll mousewheel");
     }
 
     handleAutoHeightSectionScroll(e) {
-      console.log("handleAutoHeightSectionScroll");
       let self = this;
+
+      if (!this.state.handleAutoHeightSectionScroll) return;
+
+      console.log("handleAutoHeightSectionScroll");
 
       const $section = $(self.sectionsByHash[self.state.index].$element);
       const sectionOffsetTop = $section.offset().top;
@@ -266,6 +275,10 @@
 
     handleSectionScroll(e) {
       let self = this;
+
+      if (!this.state.handleSectionScroll) return;
+
+      console.log("handleSectionScroll");
 
       // console.log(self.$element.outerHeight());
       // console.log($(window).height());
