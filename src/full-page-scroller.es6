@@ -41,9 +41,16 @@
         closeButtonMode: "close",
         handleSectionScroll: false,
         handleAutoHeightSectionScroll: false,
+        normalScroll: false,
       };
 
       self.init();
+    }
+
+    switchToNormalScroll() {
+      this.state.normalScroll = true;
+
+      this.unsubscribeBlockScroll();
     }
 
     init() {
@@ -62,6 +69,7 @@
       this.subscribeBlockScroll();
       this.handleSlickShowMoreButton();
       this.initCloseCollapseButton();
+      this.switchToNormalScroll();
     }
 
     initCloseCollapseButton() {
@@ -84,7 +92,10 @@
     closeCollapseSection() {
       let self = this;
 
-      if (self.sectionsByHash[self.state.index].fullHeight) {
+      if (
+        self.sectionsByHash[self.state.index].fullHeight &&
+        !self.state.normalScroll
+      ) {
         self.subscribeBlockScroll();
       }
 
@@ -99,9 +110,8 @@
         self.$element.removeClass("hideInvisibleSections");
         self.$element.removeClass("section-opened");
         console.log("goNext");
-        self.goNext().then(() => {
-          self.$sections.removeClass("show");
-        });
+        self.goNext();
+        self.$sections.removeClass("show");
       } else {
         $([document.documentElement]).animate(
           {
@@ -127,9 +137,12 @@
       let self = this;
 
       self.$element.addClass("section-opened");
-      self.$element.addClass("hideInvisibleSections");
-      self.unsubscribeBlockScroll();
-      self.subscribeSectionScroll();
+
+      if (!self.state.normalScroll) {
+        self.$element.addClass("hideInvisibleSections");
+        self.unsubscribeBlockScroll();
+        self.subscribeSectionScroll();
+      }
 
       self.state.nestedSectionOpened = true;
 
@@ -308,6 +321,7 @@
       let deltaClearTimeout = null;
 
       this.$element.on("scroll wheel mousewheel", (e) => {
+        if (this.state.normalScroll) return;
         clearTimeout(deltaClearTimeout);
 
         if (self.state.nestedSectionOpened) return;

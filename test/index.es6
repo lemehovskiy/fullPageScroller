@@ -6,4 +6,7 @@ require("../dist/full-page-scroller.js");
 
 jQuery(function () {
   $(".full-page").fullPageScroller();
+
+
+  
 });
