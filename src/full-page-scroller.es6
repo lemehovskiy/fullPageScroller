@@ -82,11 +82,10 @@
     closeCollapseSection() {
       let self = this;
 
-      // if (self.sectionsByHash[self.state.index].fullHeight) {
-        self.subscribeBlockScroll();  
-      // }
+      if (self.sectionsByHash[self.state.index].fullHeight) {
+        self.subscribeBlockScroll();
+      }
 
-      // self.subscribeBlockScroll();
       self.state.nestedSectionOpened = false;
 
       self.unsubscribeSectionScroll();
@@ -161,7 +160,7 @@
       if (self.sectionsByHash[index].fullHeight) {
         self.subscribeBlockScroll();
         self.unsubscribeAutoHeightSectionScroll();
-      } 
+      }
 
       if (self.animationInProgress) return;
 
@@ -180,8 +179,6 @@
           ? sectionOffsetTop
           : sectionOffsetTop + $section.outerHeight() - $(window).height();
 
-    
-
       $([document.documentElement]).animate(
         {
           scrollTop: scrollTop,
@@ -194,7 +191,7 @@
             setTimeout(() => {
               self.subscribeAutoHeightSectionScroll();
               self.unsubscribeBlockScroll();
-            }, 1)
+            }, 1);
           }
         }
       );
@@ -219,12 +216,12 @@
 
     subscribeBlockScroll() {
       this.$element.on("scroll touchmove mousewheel", this.blockScroll);
-      $('body').addClass('scroll-blocked');
+      $("body").addClass("scroll-blocked");
     }
 
     unsubscribeBlockScroll() {
       this.$element.off("scroll touchmove mousewheel", this.blockScroll);
-      $('body').removeClass('scroll-blocked');
+      $("body").removeClass("scroll-blocked");
     }
 
     subscribeSectionScroll() {
@@ -233,11 +230,11 @@
     }
 
     unsubscribeSectionScroll() {
-      $(window).off("scroll mousewheel");
+      // $(window).off("scroll mousewheel", this.handleSectionScroll.bind(this));
     }
 
     subscribeAutoHeightSectionScroll() {
-      console.log('subscribeAutoHeightSectionScroll');
+      console.log("subscribeAutoHeightSectionScroll");
       $(window).on(
         "scroll mousewheel",
         this.handleAutoHeightSectionScroll.bind(this)
@@ -245,12 +242,12 @@
     }
 
     unsubscribeAutoHeightSectionScroll() {
-      console.log('subscribeAutoHeightSectionScroll');
-      $(window).off("scroll mousewheel");
+      console.log("subscribeAutoHeightSectionScroll");
+      // $(window).off("scroll mousewheel");
     }
 
     handleAutoHeightSectionScroll(e) {
-      console.log('handleAutoHeightSectionScroll');
+      console.log("handleAutoHeightSectionScroll");
       let self = this;
 
       const $section = $(self.sectionsByHash[self.state.index].$element);
@@ -264,7 +261,7 @@
         self.goToSlide(self.state.index - 1, "prev");
       } else if (scrollBottom > sectionOffsetBottom) {
         self.goToSlide(self.state.index + 1, "next");
-      } 
+      }
     }
 
     handleSectionScroll(e) {
