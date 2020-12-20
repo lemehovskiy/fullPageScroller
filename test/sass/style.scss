@@ -34,9 +34,25 @@ body {
   cursor: pointer;
 }
 
+body {
+  &.scroll-blocked {
+    overflow: hidden;
+  }
+}
 
 .full-page {
-  section { 
+  section {
+    &.full-height {
+      .section-main-content {
+        height: 100vh;
+        padding: 0 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.5s;
+      }
+    }
+
     &.show {
       .section-collapse-content {
         display: block;
@@ -52,7 +68,6 @@ body {
   }
 
   &.showSectionContent {
-
   }
   &.section-opened {
     .showMoreButton {
@@ -77,15 +92,6 @@ body {
   left: 50%;
   z-index: 2;
   display: none;
-}
-
-.section-main-content {
-  height: 100vh;
-  padding: 0 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: transform .5s;
 }
 .section-collapse-content {
   display: none;

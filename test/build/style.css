@@ -183,6 +183,29 @@ body {
   cursor: pointer;
 }
 
+body.scroll-blocked {
+  overflow: hidden;
+}
+
+.full-page section.full-height .section-main-content {
+  height: 100vh;
+  padding: 0 20px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-transition: -webkit-transform 0.5s;
+  transition: -webkit-transform 0.5s;
+  -o-transition: transform 0.5s;
+  transition: transform 0.5s;
+  transition: transform 0.5s, -webkit-transform 0.5s;
+}
+
 .full-page section.show .section-collapse-content {
   display: block;
 }
@@ -213,25 +236,6 @@ body {
   display: none;
 }
 
-.section-main-content {
-  height: 100vh;
-  padding: 0 20px;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-transition: -webkit-transform .5s;
-  transition: -webkit-transform .5s;
-  -o-transition: transform .5s;
-  transition: transform .5s;
-  transition: transform .5s, -webkit-transform .5s;
-}
-
 .section-collapse-content {
   display: none;
 }
@@ -249,7 +253,6 @@ body {
 
 .section-intro {
   position: relative;
-  height: 100vh;
   color: white;
 }
 

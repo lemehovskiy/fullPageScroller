@@ -33,8 +33,6 @@
       self.sectionsByHash = {};
       self.totalSlides = self.$sections.length;
       self.animationInProgress = false;
-      self.xDownTouch = null;
-      self.yDownTouch = null;
 
       self.state = {
         index: 0,
@@ -53,6 +51,7 @@
         self.sectionsByHash[index] = {
           $element: el,
           $collapseTrigger: $(el).find(".showMoreButton"),
+          fullHeight: $(el).hasClass("full-height"),
         };
       });
 
@@ -66,8 +65,8 @@
     initCloseCollapseButton() {
       let self = this;
       $(".closeCollapseButton").on("click", () => {
-        console.log("closeSection");
-        self.closeSection();
+        console.log("closeCollapseSection");
+        self.closeCollapseSection();
       });
     }
 
@@ -76,14 +75,18 @@
 
       for (let i = 0; i < self.totalSlides; i++) {
         self.sectionsByHash[i].$collapseTrigger.on("click", () => {
-          this.openSection(i);
+          this.openCollapseSection(i);
         });
       }
     }
-    closeSection() {
+    closeCollapseSection() {
       let self = this;
 
-      self.subscribeBlockScroll();
+      // if (self.sectionsByHash[self.state.index].fullHeight) {
+        self.subscribeBlockScroll();  
+      // }
+
+      // self.subscribeBlockScroll();
       self.state.nestedSectionOpened = false;
 
       self.unsubscribeSectionScroll();
@@ -119,7 +122,7 @@
       }
     }
 
-    openSection(index) {
+    openCollapseSection(index) {
       let self = this;
 
       self.$element.addClass("section-opened");
@@ -151,27 +154,48 @@
       }
     }
 
-    goToSlide(index) {
+    goToSlide(index, direction = "next") {
       console.log("goToSlide");
-      // console.log(index);
       let self = this;
+
+      if (self.sectionsByHash[index].fullHeight) {
+        self.subscribeBlockScroll();
+        self.unsubscribeAutoHeightSectionScroll();
+      } 
 
       if (self.animationInProgress) return;
 
       self.animationInProgress = true;
       self.state.index = index;
 
+      const $section = $(self.sectionsByHash[index].$element);
+
       $(self.$sections).removeClass("current");
-      $(self.sectionsByHash[index].$element).addClass("current");
+      $section.addClass("current");
+
+      const sectionOffsetTop = $section.offset().top;
+
+      const scrollTop =
+        direction === "next"
+          ? sectionOffsetTop
+          : sectionOffsetTop + $section.outerHeight() - $(window).height();
+
+    
 
       $([document.documentElement]).animate(
         {
-          scrollTop: $(self.sectionsByHash[index].$element).offset().top,
+          scrollTop: scrollTop,
         },
         400,
         function () {
-          console.log("animationEnd");
           self.animationInProgress = false;
+
+          if (!self.sectionsByHash[index].fullHeight) {
+            setTimeout(() => {
+              self.subscribeAutoHeightSectionScroll();
+              self.unsubscribeBlockScroll();
+            }, 1)
+          }
         }
       );
     }
@@ -179,13 +203,13 @@
     goPrev() {
       const prevIndex = this.state.index - 1;
       if (prevIndex >= 0) {
-        this.goToSlide(prevIndex);
+        this.goToSlide(prevIndex, "prev");
       }
     }
     goNext() {
       const nextIndex = this.state.index + 1;
       if (nextIndex > this.totalSlides - 1) return;
-      return this.goToSlide(nextIndex);
+      return this.goToSlide(nextIndex, "next");
     }
 
     blockScroll(e) {
@@ -194,11 +218,13 @@
     }
 
     subscribeBlockScroll() {
-      this.$element.on("wheel scroll touchmove mousewheel", this.blockScroll);
+      this.$element.on("scroll touchmove mousewheel", this.blockScroll);
+      $('body').addClass('scroll-blocked');
     }
 
     unsubscribeBlockScroll() {
-      this.$element.off("wheel scroll touchmove mousewheel", this.blockScroll);
+      this.$element.off("scroll touchmove mousewheel", this.blockScroll);
+      $('body').removeClass('scroll-blocked');
     }
 
     subscribeSectionScroll() {
@@ -208,6 +234,37 @@
 
     unsubscribeSectionScroll() {
       $(window).off("scroll mousewheel");
+    }
+
+    subscribeAutoHeightSectionScroll() {
+      console.log('subscribeAutoHeightSectionScroll');
+      $(window).on(
+        "scroll mousewheel",
+        this.handleAutoHeightSectionScroll.bind(this)
+      );
+    }
+
+    unsubscribeAutoHeightSectionScroll() {
+      console.log('subscribeAutoHeightSectionScroll');
+      $(window).off("scroll mousewheel");
+    }
+
+    handleAutoHeightSectionScroll(e) {
+      console.log('handleAutoHeightSectionScroll');
+      let self = this;
+
+      const $section = $(self.sectionsByHash[self.state.index].$element);
+      const sectionOffsetTop = $section.offset().top;
+      const sectionOffsetBottom = sectionOffsetTop + $section.outerHeight();
+
+      const scrollTop = $(window).scrollTop();
+      const scrollBottom = scrollTop + $(window).height();
+
+      if (scrollTop < sectionOffsetTop) {
+        self.goToSlide(self.state.index - 1, "prev");
+      } else if (scrollBottom > sectionOffsetBottom) {
+        self.goToSlide(self.state.index + 1, "next");
+      } 
     }
 
     handleSectionScroll(e) {
@@ -244,6 +301,7 @@
         clearTimeout(deltaClearTimeout);
 
         if (self.state.nestedSectionOpened) return;
+        if (!self.sectionsByHash[self.state.index].fullHeight) return;
 
         absDeltaY = Math.abs(e.originalEvent.deltaY);
 
@@ -268,70 +326,64 @@
       });
     }
 
-    getTouches(evt) {
-      return (
-        evt.touches || // browser API
-        evt.originalEvent.touches
-      ); // jQuery
-    }
-
-    handleTouchStart(evt) {
-      let self = this;
-      if (self.state.nestedSectionOpened) return;
-      console.log("handleTouchStart");
-      const firstTouch = this.getTouches(evt)[0];
-      self.xDownTouch = firstTouch.clientX;
-      self.yDownTouch = firstTouch.clientY;
-    }
-
-    handleTouchMove(evt) {
-      let self = this;
-      if (self.state.nestedSectionOpened) return;
-
-      console.log("handleTouchMove");
-      console.log(self.xDownTouch);
-      console.log(self.yDownTouch);
-
-      if (!self.xDownTouch || !self.yDownTouch) {
-        return;
-      }
-
-      var xUp = evt.touches[0].clientX;
-      var yUp = evt.touches[0].clientY;
-
-      var xDiff = self.xDownTouch - xUp;
-      var yDiff = self.yDownTouch - yUp;
-
-      console.log(xDiff);
-      console.log(yDiff);
-      if (Math.abs(xDiff) > Math.abs(yDiff)) {
-        if (xDiff > 0) {
-          self.goNext();
-        } else {
-          self.goPrev();
-        }
-      } else {
-        if (yDiff > 0) {
-          self.goNext();
-        } else {
-          self.goPrev();
-        }
-      }
-
-      self.xDownTouch = null;
-      self.yDownTouch = null;
-    }
-
     initSwipe() {
       let self = this;
+
+      let xDownTouch = null;
+      let yDownTouch = null;
+
+      function getTouches(evt) {
+        return (
+          evt.touches || // browser API
+          evt.originalEvent.touches
+        ); // jQuery
+      }
+
+      function handleTouchStart(evt) {
+        if (self.state.nestedSectionOpened) return;
+        const firstTouch = getTouches(evt)[0];
+        xDownTouch = firstTouch.clientX;
+        yDownTouch = firstTouch.clientY;
+      }
+
+      function handleTouchMove(evt) {
+        if (self.state.nestedSectionOpened) return;
+
+        if (!xDownTouch || !yDownTouch) {
+          return;
+        }
+
+        var xUp = evt.touches[0].clientX;
+        var yUp = evt.touches[0].clientY;
+
+        var xDiff = xDownTouch - xUp;
+        var yDiff = yDownTouch - yUp;
+
+        if (Math.abs(xDiff) > Math.abs(yDiff)) {
+          if (xDiff > 0) {
+            self.goNext();
+          } else {
+            self.goPrev();
+          }
+        } else {
+          if (yDiff > 0) {
+            self.goNext();
+          } else {
+            self.goPrev();
+          }
+        }
+
+        xDownTouch = null;
+        yDownTouch = null;
+      }
       self.$element[0].addEventListener(
         "touchstart",
-        self.handleTouchStart.bind(self),
+        handleTouchStart.bind(self),
         false
       );
       self.$element[0].addEventListener(
         "touchmove",
-        self.handleTouchMove.bind(self),
+        handleTouchMove.bind(self),
         false
       );
     }
