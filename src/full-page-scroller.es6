@@ -52,8 +52,12 @@
 
     switchToNormalScroll() {
       this.state.normalScroll = true;
-
       this.unsubscribeBlockScroll();
+    }
+
+    switchToSectionScroll() {
+      this.state.normalScroll = false;
+      this.subscribeBlockScroll();
     }
 
     init() {
@@ -178,7 +182,7 @@
 
     goToSlide(index, direction = "next") {
       let self = this;
-      
+
       return new Promise((resolve, reject) => {
         console.log("goToSlide");
 
@@ -310,8 +314,6 @@
 
       console.log("handleSectionScroll");
 
-      // console.log(self.$element.outerHeight());
-      // console.log($(window).height());
       $("#debug .height").text(
         self.$element.outerHeight() - $(window).height()
       );
