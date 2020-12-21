@@ -44,7 +44,7 @@
         handleSectionScroll: false,
         handleAutoHeightSectionScroll: false,
         normalScroll: false,
-        handleNormalScroll: false
+        handleNormalScroll: false,
       };
 
       self.init();
@@ -72,7 +72,7 @@
       this.subscribeBlockScroll();
       this.handleSlickShowMoreButton();
       this.initCloseCollapseButton();
-      this.switchToNormalScroll();
+      // this.switchToNormalScroll();
     }
 
     initCloseCollapseButton() {
@@ -105,7 +105,7 @@
       self.state.nestedSectionOpened = false;
 
       self.unsubscribeSectionScroll();
-      $(self.sectionsByHash[self.state.index].$element).removeClass(
+      self.getCurrentSectionElement().removeClass(
         "offsetActive"
       );
 
@@ -119,9 +119,7 @@
       } else {
         $([document.documentElement]).animate(
           {
-            scrollTop: $(
-              self.sectionsByHash[self.state.openedSectionIndex].$element
-            ).offset().top,
+            scrollTop: self.getCurrentOpenedSectionElement().offset().top,
           },
           400,
           () => {
@@ -130,7 +128,7 @@
             self.$sections.removeClass("show");
 
             $([document.documentElement]).scrollTop(
-              $(self.sectionsByHash[self.state.openedSectionIndex].$element).offset().top
+              self.getCurrentOpenedSectionElement().offset().top
             );
           }
         );
@@ -148,40 +146,41 @@
         self.$element.addClass("hideInvisibleSections");
         self.unsubscribeBlockScroll();
         self.subscribeSectionScroll();
-      }
-      else {
+      } else {
         self.subscribeNormalScroll();
       }
 
       self.state.nestedSectionOpened = true;
 
       $([document.documentElement]).scrollTop(
-        $(self.sectionsByHash[index].$element).offset().top
+        self.getSectionElementByIndex(index).offset().top
       );
 
       for (let i = 0; i < self.totalSlides; i++) {
         if (i === index) {
-          $(self.sectionsByHash[index].$element).addClass("show");
-          $(self.sectionsByHash[index].$element).addClass("offsetActive");
+          self.getSectionElementByIndex(index).addClass("show");
+          self.getSectionElementByIndex(index).addClass("offsetActive");
           $([document.documentElement]).animate(
             {
-              scrollTop: $(self.sectionsByHash[index].$element)
+              scrollTop: self
+                .getSectionElementByIndex(index)
                 .find(".section-collapse-content")
                 .offset().top,
             },
             400
           );
         } else {
-          $(self.sectionsByHash[i].$element).removeClass("show");
-          $(self.sectionsByHash[index].$element).removeClass("offsetActive");
+          self.getSectionElementByIndex(i).removeClass("show");
+          self.getSectionElementByIndex(index).removeClass("offsetActive");
         }
       }
     }
 
     goToSlide(index, direction = "next") {
+      let self = this;
+      
       return new Promise((resolve, reject) => {
         console.log("goToSlide");
-        let self = this;
 
         if (self.sectionsByHash[index].fullHeight) {
           self.subscribeBlockScroll();
@@ -193,7 +192,7 @@
         self.animationInProgress = true;
         self.state.index = index;
 
-        const $section = $(self.sectionsByHash[index].$element);
+        const $section = self.getSectionElementByIndex(index);
 
         $(self.$sections).removeClass("current");
         $section.addClass("current");
@@ -252,14 +251,12 @@
     }
 
     subscribeSectionScroll() {
-      let self = this;
       this.state.handleSectionScroll = true;
       $(window).on("scroll mousewheel", this.handleSectionScroll.bind(this));
     }
 
     unsubscribeSectionScroll() {
       this.state.handleSectionScroll = false;
-      // $(window).off("scroll mousewheel", this.handleSectionScroll.bind(this));
     }
 
     subscribeAutoHeightSectionScroll() {
@@ -274,7 +271,6 @@
     unsubscribeAutoHeightSectionScroll() {
       console.log("subscribeAutoHeightSectionScroll");
       this.state.handleAutoHeightSectionScroll = false;
-      // $(window).off("scroll mousewheel");
     }
 
     subscribeNormalScroll() {
@@ -293,7 +289,7 @@
 
       console.log("handleAutoHeightSectionScroll");
 
-      const $section = $(self.sectionsByHash[self.state.index].$element);
+      const $section = this.getCurrentSectionElement();
       const sectionOffsetTop = $section.offset().top;
       const sectionOffsetBottom = sectionOffsetTop + $section.outerHeight();
 
@@ -334,44 +330,43 @@
       }
     }
 
-
     handleNormalScroll() {
       if (!this.state.handleNormalScroll) return;
 
       clearTimeout(this.normalScrollingTimeout);
 
-      const $section = this.getCurrentOpenedSection();
+      const $section = this.getCurrentOpenedSectionElement();
       const sectionOffsetTop = $section.offset().top;
       const sectionOffsetBottom = sectionOffsetTop + $section.outerHeight();
 
       const scrollTop = $(window).scrollTop();
       const scrollBottom = scrollTop + $(window).height();
 
-      $('.closeCollapseButton').addClass('scrolling');
+      $(".closeCollapseButton").addClass("scrolling");
 
-    
       if (scrollBottom > sectionOffsetBottom || scrollTop < sectionOffsetTop) {
-        $('.closeCollapseButton').addClass('hidden');
-      }
-      else {
-        $('.closeCollapseButton').removeClass('hidden');
+        $(".closeCollapseButton").addClass("hidden");
+      } else {
+        $(".closeCollapseButton").removeClass("hidden");
       }
 
       this.normalScrollingTimeout = setTimeout(() => {
-        $('.closeCollapseButton').removeClass('scrolling');
-      }, 500)
-  
+        $(".closeCollapseButton").removeClass("scrolling");
+      }, 500);
 
-      console.log('handleNormalScroll');
-      
+      console.log("handleNormalScroll");
     }
 
-    getCurrentSection() {
-      return $(this.sectionsByHash[this.state.openedSectionIndex].$element);
+    getSectionElementByIndex(index) {
+      return $(this.sectionsByHash[index].$element);
     }
 
-    getCurrentOpenedSection() {
-      return $(this.sectionsByHash[this.state.openedSectionIndex].$element);
+    getCurrentSectionElement() {
+      return this.getSectionElementByIndex(this.state.index);
+    }
+
+    getCurrentOpenedSectionElement() {
+      return this.getSectionElementByIndex(this.state.openedSectionIndex);
     }
 
     initScroll() {
