@@ -69,7 +69,7 @@
       this.subscribeBlockScroll();
       this.handleSlickShowMoreButton();
       this.initCloseCollapseButton();
-      this.switchToNormalScroll();
+      // this.switchToNormalScroll();
     }
 
     initCloseCollapseButton() {
@@ -110,8 +110,9 @@
         self.$element.removeClass("hideInvisibleSections");
         self.$element.removeClass("section-opened");
         console.log("goNext");
-        self.goNext();
-        self.$sections.removeClass("show");
+        self.goNext().then(() => {
+          self.$sections.removeClass("show");
+        });
       } else {
         $([document.documentElement]).animate(
           {
@@ -169,47 +170,49 @@
     }
 
     goToSlide(index, direction = "next") {
-      console.log("goToSlide");
-      let self = this;
+      return new Promise((resolve, reject) => {
+        console.log("goToSlide");
+        let self = this;
 
-      if (self.sectionsByHash[index].fullHeight) {
-        self.subscribeBlockScroll();
-        self.unsubscribeAutoHeightSectionScroll();
-      }
-
-      if (self.animationInProgress) return;
-
-      self.animationInProgress = true;
-      self.state.index = index;
-
-      const $section = $(self.sectionsByHash[index].$element);
-
-      $(self.$sections).removeClass("current");
-      $section.addClass("current");
-
-      const sectionOffsetTop = $section.offset().top;
-
-      const scrollTop =
-        direction === "next"
-          ? sectionOffsetTop
-          : sectionOffsetTop + $section.outerHeight() - $(window).height();
-
-      $([document.documentElement]).animate(
-        {
-          scrollTop: scrollTop,
-        },
-        400,
-        function () {
-          self.animationInProgress = false;
-
-          if (!self.sectionsByHash[index].fullHeight) {
-            setTimeout(() => {
-              self.subscribeAutoHeightSectionScroll();
-              self.unsubscribeBlockScroll();
-            }, 1);
-          }
+        if (self.sectionsByHash[index].fullHeight) {
+          self.subscribeBlockScroll();
+          self.unsubscribeAutoHeightSectionScroll();
         }
-      );
+
+        if (self.animationInProgress) return;
+
+        self.animationInProgress = true;
+        self.state.index = index;
+
+        const $section = $(self.sectionsByHash[index].$element);
+
+        $(self.$sections).removeClass("current");
+        $section.addClass("current");
+
+        const sectionOffsetTop = $section.offset().top;
+
+        const scrollTop =
+          direction === "next"
+            ? sectionOffsetTop
+            : sectionOffsetTop + $section.outerHeight() - $(window).height();
+
+        $([document.documentElement]).animate(
+          {
+            scrollTop: scrollTop,
+          },
+          400,
+          function () {
+            self.animationInProgress = false;
+            resolve();
+            if (!self.sectionsByHash[index].fullHeight) {
+              setTimeout(() => {
+                self.subscribeAutoHeightSectionScroll();
+                self.unsubscribeBlockScroll();
+              }, 1);
+            }
+          }
+        );
+      });
     }
 
     goPrev() {
