@@ -36,12 +36,14 @@
 
       self.state = {
         index: 0,
+        openedSectionIndex: 0,
         animationInProgress: false,
         nestedSectionOpened: false,
         closeButtonMode: "close",
         handleSectionScroll: false,
         handleAutoHeightSectionScroll: false,
         normalScroll: false,
+        handleNormalScroll: false
       };
 
       self.init();
@@ -69,7 +71,7 @@
       this.subscribeBlockScroll();
       this.handleSlickShowMoreButton();
       this.initCloseCollapseButton();
-      // this.switchToNormalScroll();
+      this.switchToNormalScroll();
     }
 
     initCloseCollapseButton() {
@@ -117,7 +119,7 @@
         $([document.documentElement]).animate(
           {
             scrollTop: $(
-              self.sectionsByHash[self.state.index].$element
+              self.sectionsByHash[self.state.openedSectionIndex].$element
             ).offset().top,
           },
           400,
@@ -127,7 +129,7 @@
             self.$sections.removeClass("show");
 
             $([document.documentElement]).scrollTop(
-              $(self.sectionsByHash[self.state.index].$element).offset().top
+              $(self.sectionsByHash[self.state.openedSectionIndex].$element).offset().top
             );
           }
         );
@@ -139,10 +141,15 @@
 
       self.$element.addClass("section-opened");
 
+      self.state.openedSectionIndex = index;
+
       if (!self.state.normalScroll) {
         self.$element.addClass("hideInvisibleSections");
         self.unsubscribeBlockScroll();
         self.subscribeSectionScroll();
+      }
+      else {
+        self.subscribeNormalScroll();
       }
 
       self.state.nestedSectionOpened = true;
@@ -165,6 +172,7 @@
           );
         } else {
           $(self.sectionsByHash[i].$element).removeClass("show");
+          $(self.sectionsByHash[index].$element).removeClass("offsetActive");
         }
       }
     }
@@ -268,6 +276,15 @@
       // $(window).off("scroll mousewheel");
     }
 
+    subscribeNormalScroll() {
+      this.state.handleNormalScroll = true;
+      $(window).on("scroll mousewheel", this.handleNormalScroll.bind(this));
+    }
+
+    unsubscribeNormalScroll() {
+      this.state.handleNormalScroll = false;
+    }
+
     handleAutoHeightSectionScroll(e) {
       let self = this;
 
@@ -314,6 +331,12 @@
         self.state.closeButtonMode = "close";
         $(".closeCollapseButton").text("Close");
       }
+    }
+
+
+    handleNormalScroll() {
+      console.log('handleNormalScroll');
+      
     }
 
     initScroll() {

@@ -210,11 +210,11 @@ body.scroll-blocked {
   display: block;
 }
 
-.full-page.hideInvisibleSections section:not(.show) {
+.full-page section.show .showMoreButton {
   display: none;
 }
 
-.full-page.section-opened .showMoreButton {
+.full-page.hideInvisibleSections section:not(.show) {
   display: none;
 }
 
