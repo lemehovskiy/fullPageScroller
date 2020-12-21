@@ -33,6 +33,7 @@
       self.sectionsByHash = {};
       self.totalSlides = self.$sections.length;
       self.animationInProgress = false;
+      self.normalScrollingTimeout = null;
 
       self.state = {
         index: 0,
@@ -335,8 +336,42 @@
 
 
     handleNormalScroll() {
+      if (!this.state.handleNormalScroll) return;
+
+      clearTimeout(this.normalScrollingTimeout);
+
+      const $section = this.getCurrentOpenedSection();
+      const sectionOffsetTop = $section.offset().top;
+      const sectionOffsetBottom = sectionOffsetTop + $section.outerHeight();
+
+      const scrollTop = $(window).scrollTop();
+      const scrollBottom = scrollTop + $(window).height();
+
+      $('.closeCollapseButton').addClass('scrolling');
+
+    
+      if (scrollBottom > sectionOffsetBottom || scrollTop < sectionOffsetTop) {
+        $('.closeCollapseButton').addClass('hidden');
+      }
+      else {
+        $('.closeCollapseButton').removeClass('hidden');
+      }
+
+      this.normalScrollingTimeout = setTimeout(() => {
+        $('.closeCollapseButton').removeClass('scrolling');
+      }, 500)
+  
+
       console.log('handleNormalScroll');
       
+    }
+
+    getCurrentSection() {
+      return $(this.sectionsByHash[this.state.openedSectionIndex].$element);
+    }
+
+    getCurrentOpenedSection() {
+      return $(this.sectionsByHash[this.state.openedSectionIndex].$element);
     }
 
     initScroll() {

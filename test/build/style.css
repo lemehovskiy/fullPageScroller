@@ -236,6 +236,14 @@ body.scroll-blocked {
   display: none;
 }
 
+.closeCollapseButton.scrolling {
+  opacity: .5;
+}
+
+.closeCollapseButton.hidden {
+  display: none !important;
+}
+
 .section-collapse-content {
   display: none;
 }
