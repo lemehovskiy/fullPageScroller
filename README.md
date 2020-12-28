@@ -3,7 +3,7 @@ full-page-scroller
 
 ### Demo
 
-[https://lemehovskiy.github.io/full-page-scroller/test](https://lemehovskiy.github.io/full-page-scroller/test/)
+[https://lemehovskiy.github.io/fullPageScroller/test/index.html](https://lemehovskiy.github.io/fullPageScroller/test/index.html)
 
 ### Browser support
 
