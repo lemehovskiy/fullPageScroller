@@ -76,13 +76,11 @@
       this.subscribeBlockScroll();
       this.handleSlickShowMoreButton();
       this.initCloseCollapseButton();
-      // this.switchToNormalScroll();
     }
 
     initCloseCollapseButton() {
       let self = this;
       $(".closeCollapseButton").on("click", () => {
-        console.log("closeCollapseSection");
         self.closeCollapseSection();
       });
     }
@@ -109,14 +107,11 @@
       self.state.nestedSectionOpened = false;
 
       self.unsubscribeSectionScroll();
-      self.getCurrentSectionElement().removeClass(
-        "offsetActive"
-      );
+      self.getCurrentSectionElement().removeClass("offsetActive");
 
       if (self.state.closeButtonMode === "next") {
         self.$element.removeClass("hideInvisibleSections");
         self.$element.removeClass("section-opened");
-        console.log("goNext");
         self.goNext().then(() => {
           self.$sections.removeClass("show");
         });
@@ -184,8 +179,6 @@
       let self = this;
 
       return new Promise((resolve, reject) => {
-        console.log("goToSlide");
-
         if (self.sectionsByHash[index].fullHeight) {
           self.subscribeBlockScroll();
           self.unsubscribeAutoHeightSectionScroll();
@@ -215,6 +208,7 @@
           400,
           function () {
             self.animationInProgress = false;
+            self.$element.trigger('fullPageScroller.goToSlide', index);
             resolve();
             if (!self.sectionsByHash[index].fullHeight) {
               setTimeout(() => {
@@ -264,7 +258,6 @@
     }
 
     subscribeAutoHeightSectionScroll() {
-      console.log("subscribeAutoHeightSectionScroll");
       this.state.handleAutoHeightSectionScroll = true;
       $(window).on(
         "scroll mousewheel",
@@ -273,7 +266,6 @@
     }
 
     unsubscribeAutoHeightSectionScroll() {
-      console.log("subscribeAutoHeightSectionScroll");
       this.state.handleAutoHeightSectionScroll = false;
     }
 
@@ -290,8 +282,6 @@
       let self = this;
 
       if (!this.state.handleAutoHeightSectionScroll) return;
-
-      console.log("handleAutoHeightSectionScroll");
 
       const $section = this.getCurrentSectionElement();
       const sectionOffsetTop = $section.offset().top;
@@ -311,8 +301,6 @@
       let self = this;
 
       if (!this.state.handleSectionScroll) return;
-
-      console.log("handleSectionScroll");
 
       $("#debug .height").text(
         self.$element.outerHeight() - $(window).height()
@@ -355,8 +343,6 @@
       this.normalScrollingTimeout = setTimeout(() => {
         $(".closeCollapseButton").removeClass("scrolling");
       }, 500);
-
-      console.log("handleNormalScroll");
     }
 
     getSectionElementByIndex(index) {
