@@ -29,7 +29,7 @@ jQuery(function () {
       clearTimeout(resizeTimeOut);
       resizeTimeOut = setTimeout(() => {
         handleResize();
-      }, 500);
+      }, 100);
     });
   };
 

@@ -409,6 +409,7 @@
 
       function handleTouchStart(evt) {
         if (self.state.nestedSectionOpened) return;
+        if (self.state.normalScroll) return;
         const firstTouch = getTouches(evt)[0];
         xDownTouch = firstTouch.clientX;
         yDownTouch = firstTouch.clientY;
@@ -416,6 +417,7 @@
 
       function handleTouchMove(evt) {
         if (self.state.nestedSectionOpened) return;
+        if (self.state.normalScroll) return;
 
         if (!xDownTouch || !yDownTouch) {
           return;
