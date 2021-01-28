@@ -110,7 +110,7 @@ jQuery(function () {
 
   init();
 
-  //EVENTS
+  //EVENTS1
   $(".full-page").on("fullPageScroller.goToSlideStart", function (el, index) {
     console.log('Start go to - ' + index);
   });
