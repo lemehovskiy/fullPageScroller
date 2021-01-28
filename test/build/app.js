@@ -111,8 +111,25 @@ jQuery(function () {
   init();
 
   //EVENTS
-  $(".full-page").on("fullPageScroller.goToSlide", function (el, index) {
-    console.log(index);
+  $(".full-page").on("fullPageScroller.goToSlideStart", function (el, index) {
+    console.log('Start go to - ' + index);
+  });
+  $(".full-page").on("fullPageScroller.goToSlideEnded", function (el, index) {
+    console.log('Ended go to - ' + index);
+  });
+
+  $(".full-page").on("fullPageScroller.openCollapseStart", function (el, index) {
+    console.log('Collapse open start - ' + index);
+  });
+  $(".full-page").on("fullPageScroller.openCollapseEnded", function (el, index) {
+    console.log('Collapse open ended - ' + index);
+  });
+
+  $(".full-page").on("fullPageScroller.closeCollapseStart", function (el, index) {
+    console.log('Collapse close start - ' + index);
+  });
+  $(".full-page").on("fullPageScroller.closeCollapseEnded", function (el, index) {
+    console.log('Collapse close ended - ' + index);
   });
 });
 

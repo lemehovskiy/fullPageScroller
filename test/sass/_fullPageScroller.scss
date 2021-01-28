@@ -1,81 +1,79 @@
 .showMoreButton {
-    padding: 10px;
-    cursor: pointer;
+  padding: 10px;
+  cursor: pointer;
+}
+
+body {
+  &.scroll-blocked {
+    overflow: hidden;
   }
-  
-  body {
-    &.scroll-blocked {
-      overflow: hidden;
-    }
-  }
-  
-  
-  .full-page {
-    section {
-      &.full-height {
-        .section-main-content {
-          height: 100vh;
-          padding: 0 20px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          transition: transform 0.5s;
-        }
-      }
-  
-      &.show {
-        .section-collapse-content {
-          display: block;
-        }
-  
-        .showMoreButton {
-          display: none;
-        }
+}
+
+.full-page {
+  section {
+    &.full-height {
+      .section-main-content {
+        height: 100vh;
+        padding: 0 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.5s;
       }
     }
-    &.hideInvisibleSections {
-      section {
-        &:not(.show) {
-          display: none;
-        }
-      }
-    }
-  
-    &.showSectionContent {
-    }
-    &.section-opened {
-      section {
-        &.offsetActive {
-          .section-main-content {
-            transform: translateY(-100px);
-          }
-        }
-      }
-      .closeCollapseButton {
+
+    &.show {
+      .section-collapse-content {
         display: block;
       }
+
+      .showMoreButton {
+        display: none;
+      }
     }
   }
-  
-  .closeCollapseButton {
-    position: fixed;
-    bottom: 10px;
-    left: 50%;
-    z-index: 2;
-    display: none;
-  
-    &.scrolling {
-      opacity: .5;
-    }
-    &.hidden {
-      display: none !important;
+  &.hideInvisibleSections {
+    section {
+      &:not(.show) {
+        display: none;
+      }
     }
   }
-  .section-collapse-content {
-    display: none;
+
+  &.showSectionContent {
   }
-  
-  .block {
-    padding: 100px 50px;
+  &.section-opened {
+    section {
+      &.offsetActive {
+        .section-main-content {
+          transform: translateY(-100px);
+        }
+      }
+    }
+    .closeCollapseButton {
+      display: block;
+    }
   }
-  
+}
+
+.closeCollapseButton {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  z-index: 2;
+  display: none;
+
+  &.scrolling {
+    opacity: 0.5;
+  }
+  &.hidden {
+    display: none !important;
+  }
+}
+.section-collapse-content {
+  display: none;
+}
+
+.block {
+  padding: 100px 50px;
+}

@@ -32,7 +32,24 @@ jQuery(function () {
   init();
 
   //EVENTS
-  $(".full-page").on("fullPageScroller.goToSlide", (el, index) => {
-    console.log(index);
+  $(".full-page").on("fullPageScroller.goToSlideStart", (el, index) => {
+    console.log('Start go to - ' + index);
+  });
+  $(".full-page").on("fullPageScroller.goToSlideEnded", (el, index) => {
+    console.log('Ended go to - ' + index);
+  });
+
+  $(".full-page").on("fullPageScroller.openCollapseStart", (el, index) => {
+    console.log('Collapse open start - ' + index);
+  });
+  $(".full-page").on("fullPageScroller.openCollapseEnded", (el, index) => {
+    console.log('Collapse open ended - ' + index);
+  });
+
+  $(".full-page").on("fullPageScroller.closeCollapseStart", (el, index) => {
+    console.log('Collapse close start - ' + index);
+  });
+  $(".full-page").on("fullPageScroller.closeCollapseEnded", (el, index) => {
+    console.log('Collapse close ended - ' + index);
   });
 });

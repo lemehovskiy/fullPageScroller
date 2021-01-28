@@ -96,6 +96,7 @@
     }
     closeCollapseSection() {
       let self = this;
+      let index = this.state.openedSectionIndex;
 
       if (
         self.sectionsByHash[self.state.index].fullHeight &&
@@ -109,11 +110,14 @@
       self.unsubscribeSectionScroll();
       self.getCurrentSectionElement().removeClass("offsetActive");
 
+      self.$element.trigger('fullPageScroller.closeCollapseStart', index);
+
       if (self.state.closeButtonMode === "next") {
         self.$element.removeClass("hideInvisibleSections");
         self.$element.removeClass("section-opened");
         self.goNext().then(() => {
           self.$sections.removeClass("show");
+          self.$element.trigger('fullPageScroller.closeCollapseEnded', index);
         });
       } else {
         $([document.documentElement]).animate(
@@ -125,6 +129,7 @@
             self.$element.removeClass("section-opened");
             self.$element.removeClass("hideInvisibleSections");
             self.$sections.removeClass("show");
+            self.$element.trigger('fullPageScroller.closeCollapseEnded', index);
 
             $([document.documentElement]).scrollTop(
               self.getCurrentOpenedSectionElement().offset().top
@@ -157,6 +162,7 @@
 
       for (let i = 0; i < self.totalSlides; i++) {
         if (i === index) {
+          self.$element.trigger('fullPageScroller.openCollapseStart', index);
           self.getSectionElementByIndex(index).addClass("show");
           self.getSectionElementByIndex(index).addClass("offsetActive");
           $([document.documentElement]).animate(
@@ -166,7 +172,10 @@
                 .find(".section-collapse-content")
                 .offset().top,
             },
-            400
+            400,
+            () => {
+              self.$element.trigger('fullPageScroller.openCollapseEnded', index);
+            }
           );
         } else {
           self.getSectionElementByIndex(i).removeClass("show");
@@ -201,6 +210,7 @@
             ? sectionOffsetTop
             : sectionOffsetTop + $section.outerHeight() - $(window).height();
 
+        self.$element.trigger('fullPageScroller.goToSlideStart', index);
         $([document.documentElement]).animate(
           {
             scrollTop: scrollTop,
@@ -208,8 +218,8 @@
           400,
           function () {
             self.animationInProgress = false;
-            self.$element.trigger('fullPageScroller.goToSlide', index);
             resolve();
+            self.$element.trigger('fullPageScroller.goToSlideEnded', index);
             if (!self.sectionsByHash[index].fullHeight) {
               setTimeout(() => {
                 self.subscribeAutoHeightSectionScroll();

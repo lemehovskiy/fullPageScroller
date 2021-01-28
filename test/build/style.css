@@ -232,7 +232,7 @@ body.scroll-blocked {
 }
 
 .closeCollapseButton.scrolling {
-  opacity: .5;
+  opacity: 0.5;
 }
 
 .closeCollapseButton.hidden {
